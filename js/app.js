@@ -2,12 +2,6 @@
 // 【重要・引き継ぎ担当者向け】
 // このファイルはGoogleスプレッドシートからお知らせを
 // 取得して表示するためのコードです。
-//
-// スプレッドシートのURLを変更する場合は
-// 下記の SHEET_ID を書き換えてください。
-//
-// gid（シートのID）はスプレッドシートのURLから確認できます。
-// 例）.../edit#gid=123456789 の「123456789」部分
 // ==========================================
 
 const SHEET_ID = '1rwAyehf35erUJ_RAnHhblQTaVg5f2v0Tmm7LZEKi5pQ';
@@ -23,25 +17,24 @@ const OFFICER_FILE_GID = '1119241247';
 const OFFICER_LINK_GID = '2118239597';
 const OFFICER_CONTACT_GID = '162722256';
 
-const NOTICE_URL = 
+const NOTICE_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${NOTICE_GID}`;
-const EVENT_URL = 
+const EVENT_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${EVENT_GID}`;
-const LINK_URL = 
+const LINK_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${LINK_GID}`;
 
-const OFFICER_NOTICE_URL = 
+const OFFICER_NOTICE_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_NOTICE_GID}`;
-const OFFICER_FILE_URL = 
+const OFFICER_FILE_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_FILE_GID}`;
-const OFFICER_LINK_URL = 
+const OFFICER_LINK_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_LINK_GID}`;
-const OFFICER_CONTACT_URL = 
+const OFFICER_CONTACT_URL =
     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_CONTACT_GID}`;
 
 // 新着マークを表示する日数（この日数以内の投稿にNEWバッジを表示）
 const NEW_THRESHOLD_DAYS = 3;
-
 // 「まもなく終了」マークを表示する日数（終了日までこの日数以内でバッジを表示）
 const ENDING_SOON_THRESHOLD_DAYS = 3;
 
@@ -55,12 +48,14 @@ function initTabs() {
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const target = button.dataset.tab;
+            if (!target) return;
 
             tabButtons.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
 
             button.classList.add('active');
-            document.getElementById(target).classList.add('active');
+            const targetEl = document.getElementById(target);
+            if (targetEl) targetEl.classList.add('active');
         });
     });
 }
@@ -328,7 +323,7 @@ function renderLinks(items, container) {
 // ==========================================
 async function loadOfficerPortalData() {
     try {
-        // 1. 伝言データの取得 (gid=1832753520)
+        // 1. 伝言データ
         const noticeRes = await fetch(OFFICER_NOTICE_URL);
         if (noticeRes.ok) {
             const rows = parseCSVToRows(await noticeRes.text());
@@ -340,21 +335,23 @@ async function loadOfficerPortalData() {
             }
             const noticeList = document.getElementById('dynamic-notices');
             if (noticeList) {
-                noticeList.innerHTML = notices.length > 0 
-                    ? notices.map(item => `<li><strong>${escapeHtml(item.text)}</strong> ${item.date ? '(' + escapeHtml(item.date) + ')' : ''}</li>`).join('')
+                noticeList.innerHTML = notices.length > 0
+                    ? notices.map(item =>
+                        `<li><strong>${escapeHtml(item.text)}</strong> ${item.date ? '(' + escapeHtml(item.date) + ')' : ''}</li>`
+                    ).join('')
                     : '<li>現在、新しい伝言はありません。</li>';
             }
         }
 
-        // 2. ファイルデータの取得 (gid=1119241247)
+        // 2. ファイルデータ
         const fileRes = await fetch(OFFICER_FILE_URL);
         if (fileRes.ok) {
             const rows = parseCSVToRows(await fileRes.text());
             const files = [];
             for (let i = 1; i < rows.length; i++) {
                 if (rows[i][0] && rows[i][0].trim() !== '') {
-                    files.push({ 
-                        name: rows[i][0].trim(), 
+                    files.push({
+                        name: rows[i][0].trim(),
                         meta: rows[i][1] ? rows[i][1].trim() : 'PDF',
                         url: rows[i][2] ? rows[i][2].trim() : '#'
                     });
@@ -363,15 +360,23 @@ async function loadOfficerPortalData() {
             const fileList = document.getElementById('dynamic-files');
             if (fileList) {
                 fileList.innerHTML = files.length > 0
-                    ? files.map(file => `
-                        <li><a href="${escapeHtml(file.url)}" target="_blank" rel="noopener noreferrer">
-                            <span>📄 ${escapeHtml(file.name)}</span><span class="file-meta">${escapeHtml(file.meta)}</span>
-                        </a></li>`).join('')
+                    ? files.map(file => {
+                        const safeName = escapeHtml(file.name);
+                        // handleDownload は index.html のインライン側に存在
+                        const onClick = `handleDownload('${safeName}')`;
+                        return `
+                            <li>
+                                <a href="${escapeHtml(file.url)}" target="_blank" rel="noopener noreferrer" onclick="${onClick}">
+                                    <span>📄 ${safeName}</span><span class="file-meta">${escapeHtml(file.meta)}</span>
+                                </a>
+                            </li>
+                        `;
+                    }).join('')
                     : '<li>現在、共有ファイルはありません。</li>';
             }
         }
 
-        // 3. クイックリンクデータの取得 (gid=2118239597)
+        // 3. クイックリンクデータ
         const linkRes = await fetch(OFFICER_LINK_URL);
         if (linkRes.ok) {
             const rows = parseCSVToRows(await linkRes.text());
@@ -387,12 +392,13 @@ async function loadOfficerPortalData() {
                     ? links.map(link => `
                         <li><a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
                             <span>${escapeHtml(link.title)}</span><span class="external-icon">↗ 外部</span>
-                        </a></li>`).join('')
+                        </a></li>
+                    `).join('')
                     : '<li>リンクはありません。</li>';
             }
         }
 
-        // 4. 緊急連絡先データの取得 (gid=162722256)
+        // 4. 緊急連絡先データ
         const contactRes = await fetch(OFFICER_CONTACT_URL);
         if (contactRes.ok) {
             const rows = parseCSVToRows(await contactRes.text());
@@ -418,7 +424,6 @@ async function loadOfficerPortalData() {
                     : '<tr><td colspan="3" style="padding: 6px;">データがありません。</td></tr>';
             }
         }
-
     } catch (e) {
         console.error("役員ポータルデータ取得エラー:", e);
     }
@@ -439,7 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadNotices();
     loadEvents();
     loadLinks();
-    
-    // 役員ページ用データの読み込みを実行
-    loadOfficerPortalData();
+
+    // 役員データは認証成功後（index.htmlのhandleLogin）で読み込む
 });
