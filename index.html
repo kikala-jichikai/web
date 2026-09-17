@@ -120,13 +120,13 @@
             <span class="main-line">キララガーデン自治会</span>
         </h1>
         <nav class="tab-nav">
-            <button class="tab-button active" data-tab="notice">お知らせ</button>
-            <button class="tab-button" data-tab="board">今月の掲示板・回覧</button>
-            <button class="tab-button" data-tab="event">行事予定</button>
-            <button class="tab-button" data-tab="about">自治会について</button>
-            <button class="tab-button" data-tab="contact">ご意見・ご要望</button>
-            <button class="tab-button" data-tab="links">リンク</button>
-            <button class="tab-button" data-tab="officer">🔒 役員向け</button>
+            <button type="button" class="tab-button active" data-tab="notice">お知らせ</button>
+            <button type="button" class="tab-button" data-tab="board">今月の掲示板・回覧</button>
+            <button type="button" class="tab-button" data-tab="event">行事予定</button>
+            <button type="button" class="tab-button" data-tab="about">自治会について</button>
+            <button type="button" class="tab-button" data-tab="contact">ご意見・ご要望</button>
+            <button type="button" class="tab-button" data-tab="links">リンク</button>
+            <button type="button" class="tab-button" data-tab="officer">🔒 役員向け</button>
         </nav>
     </header>
 
@@ -151,7 +151,7 @@
     <!-- メインコンテンツエリア -->
     <main>
         <div class="mobile-content-area">
-            
+
             <!-- お知らせタブ -->
             <section id="notice" class="tab-content active">
                 <div id="notice-container"><p id="loading">読み込み中...</p></div>
@@ -183,7 +183,7 @@
                     </dl>
                 </div>
             </section>
-            
+
             <!-- ご意見・ご要望タブ（固定コンテンツ） -->
             <section id="contact" class="tab-content">
                 <div class="notice-warning">
@@ -230,7 +230,7 @@
             <section id="officer" class="tab-content">
                 <div class="info-card">
                     <h2>役員向けポータル</h2>
-                    
+
                     <!-- ログインフォームコンテナ -->
                     <div id="login-container" style="margin-top: 15px;">
                         <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
@@ -310,7 +310,7 @@
     <!-- 外部スクリプト -->
     <script src="js/app.js"></script>
 
-    <!-- インラインスクリプト（認証・ログ送信・動的スプレッドシートデータ取得） -->
+    <!-- インラインスクリプト（アクセスログ送信・役員ログイン/ログアウト・ダウンロードログ） -->
     <script>
         // GAS WebアプリのエンドポイントURL（アクセスログ記録用）
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwQqhJ9dZmh4rZJyiuXJ8t_oTA7U2sOIFiLy1jFgSXWTR94MPzBJJDcg7jgOHJQIHyKTQ/exec";
@@ -329,6 +329,7 @@
             const timestamp = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
             const deviceInfo = [`IP: ${clientIp}`, `解像度: ${window.screen.width}x${window.screen.height}`, `UA: ${navigator.userAgent}`].join(" | ");
 
+            // no-cors のため厳密なレスポンスは取得できない想定
             fetch(GAS_WEB_APP_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -338,195 +339,8 @@
         }
 
         /**
-         * CSV文字列を正確に2次元配列（行・列）にパースする関数（セル内改行・クォーテーション対応）
-         */
-        function parseCSVToRows(text) {
-            const rows = [];
-            let currentRow = [];
-            let currentField = '';
-            let inQuotes = false;
-
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                const nextChar = text[i + 1];
-
-                if (inQuotes) {
-                    if (char === '"') {
-                        if (nextChar === '"') {
-                            currentField += '"';
-                            i++;
-                        } else {
-                            inQuotes = false;
-                        }
-                    } else {
-                        currentField += char;
-                    }
-                } else {
-                    if (char === '"') {
-                        inQuotes = true;
-                    } else if (char === ',') {
-                        currentRow.push(currentField);
-                        currentField = '';
-                    } else if (char === '\r') {
-                        if (nextChar === '\n') i++;
-                        currentRow.push(currentField);
-                        rows.push(currentRow);
-                        currentRow = [];
-                        currentField = '';
-                    } else if (char === '\n') {
-                        currentRow.push(currentField);
-                        rows.push(currentRow);
-                        currentRow = [];
-                        currentField = '';
-                    } else {
-                        currentField += char;
-                    }
-                }
-            }
-            if (currentField !== '' || currentRow.length > 0) {
-                currentRow.push(currentField);
-                rows.push(currentRow);
-            }
-            return rows;
-        }
-
-        /**
-         * XSS対策用のHTMLエスケープ関数
-         */
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        /**
-         * 指定されたスプレッドシート（4つのGID）からデータを動的に取得してHTMLに反映する関数
-         */
-        async function loadOfficerPortalDataFromSheets() {
-            const SHEET_ID = '1rwAyehf35erUJ_RAnHhblQTaVg5f2v0Tmm7LZEKi5pQ';
-            const OFFICER_NOTICE_GID = '1832753520';
-            const OFFICER_FILE_GID = '1119241247';
-            const OFFICER_LINK_GID = '2118239597';
-            const OFFICER_CONTACT_GID = '162722256';
-
-            try {
-                // 1. 伝言・トピックデータの取得
-                const noticeRes = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_NOTICE_GID}`);
-                if (noticeRes.ok) {
-                    const rows = parseCSVToRows(await noticeRes.text());
-                    const notices = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        if (rows[i][0] && rows[i][0].trim() !== '') {
-                            notices.push({ date: rows[i][0].trim(), text: rows[i][1] ? rows[i][1].trim() : '' });
-                        }
-                    }
-                    const noticeList = document.getElementById('dynamic-notices');
-                    if (noticeList) {
-                        noticeList.innerHTML = notices.length > 0 
-                            ? notices.map(item => `<li><strong>${escapeHtml(item.text)}</strong> ${item.date ? '(' + escapeHtml(item.date) + ')' : ''}</li>`).join('')
-                            : '<li>現在、新しい伝言はありません。</li>';
-                    }
-                }
-
-                // 2. ファイル共有データの取得
-                const fileRes = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_FILE_GID}`);
-                if (fileRes.ok) {
-                    const rows = parseCSVToRows(await fileRes.text());
-                    const files = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        if (rows[i][0] && rows[i][0].trim() !== '') {
-                            files.push({ 
-                                name: rows[i][0].trim(), 
-                                meta: rows[i][1] ? rows[i][1].trim() : 'PDF',
-                                url: rows[i][2] ? rows[i][2].trim() : '#'
-                            });
-                        }
-                    }
-                    const fileList = document.getElementById('dynamic-files');
-                    if (fileList) {
-                        fileList.innerHTML = files.length > 0
-                            ? files.map(file => `
-                                <li><a href="${escapeHtml(file.url)}" target="_blank" rel="noopener noreferrer" onclick="handleDownload('${escapeHtml(file.name)}');">
-                                    <span>📄 ${escapeHtml(file.name)}</span><span class="file-meta">${escapeHtml(file.meta)}</span>
-                                </a></li>`).join('')
-                            : '<li>現在、共有ファイルはありません。</li>';
-                    }
-                }
-
-                // 3. クイックリンクデータの取得
-                const linkRes = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_LINK_GID}`);
-                if (linkRes.ok) {
-                    const rows = parseCSVToRows(await linkRes.text());
-                    const links = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        if (rows[i][0] && rows[i][0].trim() !== '' && rows[i][1]) {
-                            links.push({ title: rows[i][0].trim(), url: rows[i][1].trim() });
-                        }
-                    }
-                    const linkList = document.getElementById('dynamic-links');
-                    if (linkList) {
-                        linkList.innerHTML = links.length > 0
-                            ? links.map(link => `
-                                <li><a href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
-                                    <span>${escapeHtml(link.title)}</span><span class="external-icon">↗ 外部</span>
-                                </a></li>`).join('')
-                            : '<li>リンクはありません。</li>';
-                    }
-                }
-
-                // 4. 緊急連絡先データの取得
-                const contactRes = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${OFFICER_CONTACT_GID}`);
-                if (contactRes.ok) {
-                    const rows = parseCSVToRows(await contactRes.text());
-                    const contacts = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        if (rows[i][0] && rows[i][0].trim() !== '') {
-                            contacts.push({
-                                role: rows[i][0].trim(),
-                                name: rows[i][1] ? rows[i][1].trim() : '',
-                                tel: rows[i][2] ? rows[i][2].trim() : ''
-                            });
-                        }
-                    }
-                    const contactTable = document.getElementById('dynamic-contacts');
-                    if (contactTable) {
-                        contactTable.innerHTML = contacts.length > 0
-                            ? contacts.map(c => `
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 6px;">${escapeHtml(c.role)}</td>
-                                    <td style="padding: 6px;">${escapeHtml(c.name)}</td>
-                                    <td style="padding: 6px;"><a href="tel:${escapeHtml(c.tel)}" class="mail-link">${escapeHtml(c.tel)}</a></td>
-                                </tr>`).join('')
-                            : '<tr><td colspan="3" style="padding: 6px;">データがありません。</td></tr>';
-                    }
-                }
-
-            } catch (e) {
-                console.error("スプレッドシートデータ取得エラー:", e);
-            }
-        }
-
-        // タブ切り替え制御
-        document.addEventListener('DOMContentLoaded', function() {
-            const towerBtns = document.querySelectorAll('.tower-btn');
-            const pcTabBtns = document.querySelectorAll('.tab-button');
-            
-            function switchTab(targetTab) {
-                towerBtns.forEach(b => { if(b.getAttribute('data-tab') === targetTab) b.classList.add('active'); else b.classList.remove('active'); });
-                pcTabBtns.forEach(b => { if(b.getAttribute('data-tab') === targetTab) b.classList.add('active'); else b.classList.remove('active'); });
-
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                const targetContent = document.getElementById(targetTab);
-                if (targetContent) targetContent.classList.add('active');
-            }
-
-            towerBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab'))));
-            pcTabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab'))));
-        });
-
-        /**
          * ログイン処理（モックID/PW検証、アクセスログ送信、データ読込トリガー）
+         * ※役員データ取得は app.js 側の loadOfficerPortalData() を使用
          */
         function handleLogin() {
             const inputId = document.getElementById('login-id').value;
@@ -538,9 +352,13 @@
                 errorMsg.style.display = 'none';
                 document.getElementById('login-container').style.display = 'none';
                 document.getElementById('officer-content').style.display = 'block';
-                
-                // スプレッドシートからの動的データ取得を実行
-                loadOfficerPortalDataFromSheets();
+
+                // app.js 側の関数を呼び出す
+                if (typeof loadOfficerPortalData === 'function') {
+                    loadOfficerPortalData();
+                } else {
+                    console.error('loadOfficerPortalData is not available.');
+                }
             } else {
                 sendAccessLog("ログイン", inputId, "失敗");
                 errorMsg.style.display = 'block';
