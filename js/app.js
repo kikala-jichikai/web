@@ -453,6 +453,13 @@ function escapeHtml(text) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
+
+    const hash = window.location.hash.replace("#", "");
+    if (hash && document.getElementById(hash)) {
+        // ハッシュが存在し、該当タブがある場合 → そのタブを選択
+        switchTab(hash);
+    }
+
     loadNotices();
     loadEvents();
     loadLinks();
