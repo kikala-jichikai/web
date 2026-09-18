@@ -163,8 +163,8 @@
         変更後の内容は、本サイト上に掲載された時点で有効となります。
       </p>
 
-      <button class="back-link" type="button" onclick="goBackToOfficer()">
-        役員専用ページに戻る
+      <button class="back-link" type="button" onclick="closePrivacy()">
+        ウィンドウを閉じる
       </button>
 
       <div class="updated-date">
@@ -181,10 +181,29 @@
       el.textContent = new Date().toLocaleDateString('ja-JP');
     })();
 
-    // 役員ページへ戻る
-    function goBackToOfficer() {
-      // index.htmlに戻して、役員タブへ遷移
-      window.location.href = "index.html#officer";
+    // プライバシーページを「閉じる」動作にする
+    function closePrivacy() {
+      // まずウィンドウを閉じようとする（window.open で開いたウィンドウのみ確実に閉じられる）
+      try {
+        window.close();
+      } catch (e) {
+        // 無視してフォールバックへ
+      }
+
+      // 0.2秒後にまだ閉じられていなければフォールバック処理
+      setTimeout(() => {
+        // ブラウザによっては window.closed が正しく反映されないことがあるため慎重に判定
+        if (typeof window.closed === 'boolean' && window.closed) return;
+
+        // 履歴があれば戻る（ユーザーが前のページから来ていれば自然に戻る）
+        if (history.length > 1) {
+          history.back();
+          return;
+        }
+
+        // 最終手段：index.html に遷移（ハッシュは付けない）
+        window.location.href = 'index.html';
+      }, 200);
     }
   </script>
 </body>
