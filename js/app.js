@@ -455,14 +455,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabs();
 
     const hash = window.location.hash.replace("#", "");
+
     if (hash && document.getElementById(hash)) {
-        // ハッシュが存在し、該当タブがある場合 → そのタブを選択
-        switchTab(hash);
+        switchTab(hash);   // ← 先にタブを決める
+    } else {
+        switchTab("notice"); // ← 通常時は notice
     }
 
+    // ▼ タブが決まった後に読み込みを開始する
     loadNotices();
     loadEvents();
     loadLinks();
-
-    // 役員データは認証成功後（index.htmlのhandleLogin）で読み込む
 });
