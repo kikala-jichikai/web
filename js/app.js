@@ -42,21 +42,33 @@ const ENDING_SOON_THRESHOLD_DAYS = 3;
 // タブ切り替え機能
 // ==========================================
 function initTabs() {
-    const tabButtons = document.querySelectorAll('.tab-button');
+    const pcTabBtns = document.querySelectorAll('.tab-button');
+    const towerBtns = document.querySelectorAll('.tower-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const target = button.dataset.tab;
-            if (!target) return;
+    function switchTab(targetTab) {
+        if (!targetTab) return;
 
-            tabButtons.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-
-            button.classList.add('active');
-            const targetEl = document.getElementById(target);
-            if (targetEl) targetEl.classList.add('active');
+        // ボタン活性
+        document.querySelectorAll('.tab-button').forEach(b => {
+            b.classList.toggle('active', b.dataset.tab === targetTab);
         });
+        document.querySelectorAll('.tower-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.tab === targetTab);
+        });
+
+        // コンテンツ活性
+        tabContents.forEach(c => c.classList.remove('active'));
+        const targetContent = document.getElementById(targetTab);
+        if (targetContent) targetContent.classList.add('active');
+    }
+
+    pcTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    towerBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 }
 
