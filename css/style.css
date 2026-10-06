@@ -372,28 +372,27 @@ footer {
   }
 
   /* ============================================
-     ★ リンク一覧の「外部サイト」ボタンを
-        スマホ時だけ本文の下に移動する
+     ★ 今月の掲示板の「 外部サイト」を
+        スマホ時だけタイトルの下に移動する
      ============================================ */
 
-  /* 1行のリンクブロックを縦並びにする */
-  .link-item {
+  /* li 内の a を縦並びにする */
+  .link-list li a {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 0.4rem !important;
+    gap: 0.3rem !important;
   }
 
-  /* タイトルを上に */
-  .link-title {
-    order: 1 !important;
-    width: 100% !important;
-  }
-
-  /* 外部サイトボタンを下に */
-  .link-external {
+  /* 外部サイトアイコンを下に移動 */
+  .external-icon {
     order: 2 !important;
     margin-top: 0.2rem !important;
     align-self: flex-start !important;
+  }
+
+  /* タイトル（最初の span）は上に */
+  .link-list li a span:first-child {
+    order: 1 !important;
   }
 }
