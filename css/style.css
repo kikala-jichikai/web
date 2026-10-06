@@ -308,22 +308,66 @@ footer {
 
 /* ================================
    スマホ縦向け（幅600px以下）
-   オレンジ枠を上にまとめる
    ================================ */
 @media (max-width: 600px) {
 
-  /* 日付・カテゴリ・NEW を上にまとめて横並びにする */
-  .notice-date,
-  .notice-category,
-  .new-badge,
-  .end-badge {
-    display: inline-block !important;
-    margin-right: 0.4rem !important;
-    margin-bottom: 0.4rem !important;
+  body {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
   }
 
-  /* タイトルとの距離を調整 */
-  .notice-title {
-    margin-top: 0.4rem !important;
+  h1 {
+    font-size: 1.3rem !important;
+    margin-top: 12px !important;
+    margin-bottom: 10px !important;
+  }
+  h2 {
+    font-size: 1.15rem !important;
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+  }
+  h3 {
+    font-size: 1.05rem !important;
+    margin-top: 8px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .info-card,
+  .portal-section-box,
+  .notice-card,
+  .tab-content {
+    padding: 14px 16px !important;
+  }
+
+  p,
+  li {
+    line-height: 1.5 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  table th,
+  table td {
+    padding: 6px 4px !important;
+    font-size: 0.9rem !important;
+  }
+
+  button {
+    padding: 8px 12px !important;
+    font-size: 0.95rem !important;
+  }
+
+  .portal-section-box,
+  .notice-card {
+    margin-bottom: 16px !important;
+  }
+
+  .tab-button,
+  .tower-btn {
+    padding: 0.55rem 1rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  main {
+    padding: 1.5rem 0.8rem !important;
   }
 }
