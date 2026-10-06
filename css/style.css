@@ -349,3 +349,30 @@ footer {
     padding: 1.2rem 0.6rem !important;
   }
 }
+/* ================================
+   スマホ縦向け（幅600px以下）
+   左のオレンジ枠を上に移動する
+   ================================ */
+@media (max-width: 600px) {
+
+  /* notice-card を縦並びにする */
+  .notice-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem; /* 上下の間隔を少しだけ確保 */
+  }
+
+  /* 日付・カテゴリ・NEW を上にまとめて表示 */
+  .notice-date,
+  .notice-category,
+  .new-badge,
+  .end-badge {
+    display: inline-block;
+    margin-bottom: 0.3rem;
+  }
+
+  /* タイトルとの距離を少し詰める */
+  .notice-title {
+    margin-top: 0.4rem;
+  }
+}
