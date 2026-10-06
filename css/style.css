@@ -317,10 +317,10 @@ footer {
   .portal-section-box,
   .notice-card,
   .tab-content {
-    padding: 12px 10px !important; /* ← さらに減らした版 */
+    padding: 12px 10px !important;
   }
 
-  /* 見出しの上下余白は既存のまま（調整済み） */
+  /* 見出しの上下余白 */
   h1 {
     font-size: 1.3rem !important;
     margin-top: 12px !important;
@@ -337,23 +337,31 @@ footer {
     margin-bottom: 6px !important;
   }
 
-  /* 本文の行間も既存のまま（調整済み） */
+  /* 本文の行間 */
   p,
   li {
     line-height: 1.5 !important;
     letter-spacing: 0.02em !important;
   }
 
-  /* main の左右余白も少し詰める */
+  /* main の左右余白 */
   main {
     padding: 1.2rem 0.6rem !important;
   }
 
-  /* notice-card を縦並びにする */
+  /* ================================
+     ★ オレンジ枠を上に移動させる本体処理 ★
+     ================================ */
+
+  /* notice-card の内部を縦並びに強制変更 */
   .notice-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem; /* 上下の間隔を少しだけ確保 */
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* 左ブロックが存在する場合（構造対策） */
+  .notice-card > div {
+    width: 100% !important;
   }
 
   /* 日付・カテゴリ・NEW を上にまとめて表示 */
@@ -361,12 +369,12 @@ footer {
   .notice-category,
   .new-badge,
   .end-badge {
-    display: inline-block;
-    margin-bottom: 0.3rem;
+    display: inline-block !important;
+    margin-bottom: 0.3rem !important;
   }
 
   /* タイトルとの距離を少し詰める */
   .notice-title {
-    margin-top: 0.4rem;
+    margin-top: 0.4rem !important;
   }
 }
