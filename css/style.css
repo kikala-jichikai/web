@@ -348,12 +348,6 @@ footer {
   main {
     padding: 1.2rem 0.6rem !important;
   }
-}
-/* ================================
-   スマホ縦向け（幅600px以下）
-   左のオレンジ枠を上に移動する
-   ================================ */
-@media (max-width: 600px) {
 
   /* notice-card を縦並びにする */
   .notice-card {
