@@ -307,76 +307,45 @@ footer {
 }
 
 /* ================================
-   スマホ縦向け（幅480px以下）
+   スマホ縦向け（幅600px以下）
+   カード左右余白をさらに減らした版
    ================================ */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 
-  /* 1. フォントサイズを少し小さく（95%） */
-  body {
-    font-size: 0.95rem;
-    line-height: 1.6; /* 縦長対策として少し詰める */
-  }
-
-  /* 見出しも少しだけ縮小＋上下余白を詰める */
-  h1 {
-    font-size: 1.3rem;
-    margin-top: 12px;
-    margin-bottom: 10px;
-  }
-  h2 {
-    font-size: 1.15rem;
-    margin-top: 10px;
-    margin-bottom: 8px;
-  }
-  h3 {
-    font-size: 1.05rem;
-    margin-top: 8px;
-    margin-bottom: 6px;
-  }
-
-  /* 2. カード系の左右paddingを減らす（横幅を広く使う） */
+  /* カードの左右paddingをさらに減らす（横幅を最大限使う） */
   .info-card,
   .portal-section-box,
   .notice-card,
   .tab-content {
-    padding: 14px 16px !important; /* 横の余白を減らす */
+    padding: 12px 10px !important; /* ← さらに減らした版 */
   }
 
-  /* 3. 行間を少し詰める（縦長改善に効果大） */
+  /* 見出しの上下余白は既存のまま（調整済み） */
+  h1 {
+    font-size: 1.3rem !important;
+    margin-top: 12px !important;
+    margin-bottom: 10px !important;
+  }
+  h2 {
+    font-size: 1.15rem !important;
+    margin-top: 10px !important;
+    margin-bottom: 8px !important;
+  }
+  h3 {
+    font-size: 1.05rem !important;
+    margin-top: 8px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* 本文の行間も既存のまま（調整済み） */
   p,
   li {
-    line-height: 1.5;
-    letter-spacing: 0.02em;
+    line-height: 1.5 !important;
+    letter-spacing: 0.02em !important;
   }
 
-  /* 4. テーブルの余白も少し詰める */
-  table th,
-  table td {
-    padding: 6px 4px;
-    font-size: 0.9rem;
-  }
-
-  /* 5. ボタンの余白も少し詰める */
-  button {
-    padding: 8px 12px;
-    font-size: 0.95rem;
-  }
-
-  /* 6. カード間の余白を少し詰める */
-  .portal-section-box,
-  .notice-card {
-    margin-bottom: 16px;
-  }
-
-  /* 7. タブボタンの余白も少し詰める */
-  .tab-button,
-  .tower-btn {
-    padding: 0.55rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  /* 8. main の左右余白を少し詰める */
+  /* main の左右余白も少し詰める */
   main {
-    padding: 1.5rem 0.8rem;
+    padding: 1.2rem 0.6rem !important;
   }
 }
