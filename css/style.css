@@ -370,4 +370,35 @@ footer {
   main {
     padding: 1.5rem 0.8rem !important;
   }
+
+  /* ============================================
+     ★ 今月の掲示板・リンクページの外部リンクを
+       本文の下に移動させる（スマホ専用）
+     ============================================ */
+
+  /* カード全体を縦並びにする */
+  .info-card,
+  .portal-section-box {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* 外部リンクを本文より後ろに移動 */
+  .external-link {
+    order: 3 !important;         /* 本文より後ろにする */
+    margin-top: 0.6rem !important;
+    align-self: flex-start !important; /* 左寄せ */
+  }
+
+  /* タイトルは一番上 */
+  .info-title,
+  .portal-title {
+    order: 1 !important;
+  }
+
+  /* 本文はタイトルの次 */
+  .info-body,
+  .portal-body {
+    order: 2 !important;
+  }
 }
