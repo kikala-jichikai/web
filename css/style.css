@@ -375,22 +375,22 @@ footer {
      ★ スマホ時だけ「 外部サイト」を右寄せにする
      ============================================ */
 
-  /* li 内の a を縦並びにする（既に追加済みなら不要） */
+  /* a を縦並びの flex にする（これが必須） */
   .link-list li a {
     display: flex !important;
     flex-direction: column !important;
-    gap: 0.3rem !important;
+    width: 100% !important; /* ← 右寄せが効くように幅を持たせる */
   }
 
-  /* 外部サイトアイコンを右寄せにする */
+  /* タイトルは上 */
+  .link-list li a span:first-child {
+    order: 1 !important;
+  }
+
+  /* 外部サイトを右寄せにする */
   .external-icon {
     order: 2 !important;
     align-self: flex-end !important; /* ← 右寄せの決定打 */
-    margin-top: 0.2rem !important;
-  }
-
-  /* タイトルは上に */
-  .link-list li a span:first-child {
-    order: 1 !important;
+    margin-top: 0.3rem !important;
   }
 }
