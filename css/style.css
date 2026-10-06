@@ -372,26 +372,24 @@ footer {
   }
 
   /* ============================================
-     ★ 今月の掲示板の「 外部サイト」を
-        スマホ時だけタイトルの下に移動する
+     ★ スマホ時だけ「 外部サイト」を右寄せにする
      ============================================ */
 
-  /* li 内の a を縦並びにする */
+  /* li 内の a を縦並びにする（既に追加済みなら不要） */
   .link-list li a {
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-start !important;
     gap: 0.3rem !important;
   }
 
-  /* 外部サイトアイコンを下に移動 */
+  /* 外部サイトアイコンを右寄せにする */
   .external-icon {
     order: 2 !important;
+    align-self: flex-end !important; /* ← 右寄せの決定打 */
     margin-top: 0.2rem !important;
-    align-self: flex-start !important;
   }
 
-  /* タイトル（最初の span）は上に */
+  /* タイトルは上に */
   .link-list li a span:first-child {
     order: 1 !important;
   }
